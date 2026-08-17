@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mittari — Tap. Count. Feel the click.</title>
+<meta name="description" content="Mittari is the most satisfying way to count anything. Counters, countdowns, timers and goals — with crisp haptics — on iPhone, iPad and Apple Watch.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@125,700..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #14142a;
+    --bg-deep: #0e0e1f;
+    --panel: #1d1d38;
+    --panel-edge: #2c2c52;
+    --ink: #ececf4;
+    --ink-dim: #9a9ab0;
+    --accent: #5a6cf0;
+    --accent-bright: #8f9dff;
+    --emerald: #34d399;
+    --radius: 20px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: "Atkinson Hyperlegible", -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--accent); color: #fff; }
+
+  h1, h2, h3, .display {
+    font-family: "Anybody", "Atkinson Hyperlegible", sans-serif;
+    font-stretch: 125%;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+  }
+
+  a { color: var(--accent-bright); }
+  a:focus-visible, button:focus-visible {
+    outline: 3px solid var(--accent-bright);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* ---------- atmosphere ---------- */
+  .atmosphere {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(60vw 60vw at 85% -10%, rgba(90,108,240,.22), transparent 60%),
+      radial-gradient(50vw 50vw at -10% 40%, rgba(90,108,240,.13), transparent 60%),
+      radial-gradient(70vw 50vw at 50% 110%, rgba(52,211,153,.07), transparent 60%),
+      var(--bg);
+  }
+  .atmosphere::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: .05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- nav ---------- */
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px clamp(20px, 5vw, 56px);
+  }
+  .wordmark {
+    font-family: "Anybody", sans-serif;
+    font-stretch: 125%;
+    font-weight: 900;
+    font-size: 1.25rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .wordmark span { color: var(--accent-bright); }
+  nav .links { display: flex; gap: 26px; }
+  nav .links a {
+    color: var(--ink-dim);
+    text-decoration: none;
+    font-size: .95rem;
+  }
+  nav .links a:hover { color: var(--ink); }
+
+  /* ---------- hero ---------- */
+  header.hero {
+    min-height: 86vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4vh 24px 8vh;
+    cursor: pointer;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  .tagline {
+    font-size: clamp(1.9rem, 5.5vw, 3.4rem);
+    max-width: 16ch;
+    margin-bottom: 5vh;
+    animation: rise .8s cubic-bezier(.2,.9,.3,1) both;
+  }
+  .tagline em {
+    font-style: normal;
+    color: var(--accent-bright);
+  }
+
+  /* odometer */
+  .odometer {
+    display: inline-flex;
+    gap: clamp(6px, 1.4vw, 12px);
+    padding: clamp(18px, 3.5vw, 30px) clamp(22px, 4vw, 38px);
+    background: linear-gradient(180deg, var(--panel), var(--bg-deep));
+    border: 1px solid var(--panel-edge);
+    border-radius: calc(var(--radius) * 1.4);
+    box-shadow:
+      0 30px 80px -20px rgba(0,0,0,.7),
+      inset 0 1px 0 rgba(255,255,255,.07);
+    transition: box-shadow .35s, transform .15s;
+    animation: rise .8s .12s cubic-bezier(.2,.9,.3,1) both;
+  }
+  .hero:active .odometer { transform: scale(.985); }
+  .odometer.milestone {
+    box-shadow:
+      0 0 0 3px var(--emerald),
+      0 30px 90px -15px rgba(52,211,153,.45),
+      inset 0 1px 0 rgba(255,255,255,.07);
+  }
+
+  .digit {
+    display: block;
+    width: clamp(58px, 13vw, 118px);
+    height: clamp(84px, 19vw, 172px);
+    overflow: hidden;
+    background: linear-gradient(180deg, #101024, #191932 45%, #191932 55%, #101024);
+    border: 1px solid var(--panel-edge);
+    border-radius: 14px;
+    position: relative;
+  }
+  .digit::after {   /* counter split-line, like a mechanical wheel */
+    content: "";
+    position: absolute;
+    left: 8%; right: 8%; top: 50%;
+    border-top: 1px solid rgba(255,255,255,.06);
+  }
+  .strip {
+    display: block;
+    transition: transform .45s cubic-bezier(.25,1.4,.4,1);
+    will-change: transform;
+  }
+  .strip b {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: clamp(84px, 19vw, 172px);
+    font-family: "Anybody", sans-serif;
+    font-stretch: 125%;
+    font-weight: 900;
+    font-size: clamp(52px, 11.5vw, 104px);
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .digit.dim .strip b { color: #46466a; }
+
+  .hint {
+    margin-top: 4.5vh;
+    color: var(--ink-dim);
+    font-size: 1.05rem;
+    animation: rise .8s .24s cubic-bezier(.2,.9,.3,1) both;
+  }
+  .hint b { color: var(--ink); }
+
+  .platforms {
+    margin-top: 2.2vh;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: rise .8s .36s cubic-bezier(.2,.9,.3,1) both;
+  }
+  .pill {
+    font-size: .85rem;
+    color: var(--ink-dim);
+    border: 1px solid var(--panel-edge);
+    border-radius: 999px;
+    padding: 6px 14px;
+    background: rgba(29,29,56,.6);
+  }
+  .pill.soon {
+    color: var(--accent-bright);
+    border-color: var(--accent);
+  }
+
+  /* tap ripple */
+  .ripple {
+    position: absolute;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-bright);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    animation: ripple .6s ease-out forwards;
+  }
+  .ripple.tenth { border-color: var(--emerald); border-width: 3px; }
+  @keyframes ripple {
+    from { opacity: .9; scale: 1; }
+    to   { opacity: 0;  scale: 14; }
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(26px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* ---------- sections ---------- */
+  main { max-width: 1060px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 56px) 40px; }
+
+  section { margin: 14vh 0; }
+
+  .kicker {
+    font-family: "Anybody", sans-serif;
+    font-stretch: 125%;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .22em;
+    font-size: .8rem;
+    color: var(--accent-bright);
+    margin-bottom: 14px;
+  }
+  section h2 {
+    font-size: clamp(1.7rem, 4vw, 2.6rem);
+    max-width: 22ch;
+    margin-bottom: 34px;
+  }
+
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity .7s, transform .7s cubic-bezier(.2,.9,.3,1); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* mode cards — staggered diagonal */
+  .modes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+  }
+  .mode {
+    background: linear-gradient(165deg, var(--panel), rgba(29,29,56,.4));
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius);
+    padding: 26px 24px 24px;
+    transition: transform .3s cubic-bezier(.2,.9,.3,1), border-color .3s;
+  }
+  .mode:hover { transform: translateY(-6px); border-color: var(--accent); }
+  .mode:nth-child(2) { margin-top: 26px; }
+  .mode:nth-child(4) { margin-top: 26px; }
+  .mode .num {
+    font-family: "Anybody", sans-serif;
+    font-stretch: 125%;
+    font-weight: 900;
+    font-size: 2rem;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 10px;
+  }
+  .mode h3 { font-size: 1.1rem; margin-bottom: 8px; }
+  .mode p { color: var(--ink-dim); font-size: .95rem; }
+
+  /* feel list */
+  .feel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px 40px;
+  }
+  .feel li {
+    list-style: none;
+    padding: 14px 0 14px 34px;
+    position: relative;
+    color: var(--ink-dim);
+    border-bottom: 1px solid rgba(44,44,82,.6);
+  }
+  .feel li::before {
+    content: "";
+    position: absolute;
+    left: 4px; top: 22px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+  }
+  .feel li:nth-child(10n)::before { background: var(--emerald); box-shadow: 0 0 12px var(--emerald); }
+  .feel li b { color: var(--ink); }
+
+  /* wrist + privacy split */
+  .split {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 18px;
+  }
+  .panel {
+    background: linear-gradient(165deg, var(--panel), rgba(29,29,56,.4));
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius);
+    padding: 34px 30px;
+  }
+  .panel h2 { font-size: 1.5rem; margin-bottom: 12px; }
+  .panel p { color: var(--ink-dim); }
+  .panel.privacy { border-color: rgba(52,211,153,.35); }
+  .panel.privacy .kicker { color: var(--emerald); }
+  .panel p + p { margin-top: 10px; }
+
+  /* support */
+  #support { text-align: center; }
+  #support h2 { margin: 0 auto 14px; }
+  #support p { color: var(--ink-dim); max-width: 46ch; margin: 0 auto; }
+  .mail {
+    display: inline-block;
+    margin-top: 26px;
+    font-family: "Anybody", sans-serif;
+    font-stretch: 125%;
+    font-weight: 800;
+    font-size: clamp(1.1rem, 3vw, 1.6rem);
+    color: #fff;
+    background: linear-gradient(135deg, var(--accent), #4353c9);
+    text-decoration: none;
+    padding: 16px 30px;
+    border-radius: 999px;
+    box-shadow: 0 18px 40px -12px rgba(90,108,240,.55);
+    transition: transform .25s cubic-bezier(.2,.9,.3,1), box-shadow .25s;
+  }
+  .mail:hover { transform: translateY(-3px); box-shadow: 0 24px 50px -12px rgba(90,108,240,.7); }
+
+  footer {
+    border-top: 1px solid rgba(44,44,82,.6);
+    margin-top: 10vh;
+    padding: 34px clamp(20px, 5vw, 56px) 44px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 30px;
+    justify-content: space-between;
+    color: var(--ink-dim);
+    font-size: .9rem;
+  }
+  footer a { color: var(--ink-dim); }
+  footer a:hover { color: var(--ink); }
+  footer .fi { font-style: italic; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    html { scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+<div class="atmosphere" aria-hidden="true"></div>
+
+<nav>
+  <a class="wordmark" href="#">Mittari<span>.</span></a>
+  <div class="links">
+    <a href="#support">Support</a>
+    <a href="privacy.html">Privacy</a>
+  </div>
+</nav>
+
+<header class="hero" id="hero" role="button" tabindex="0"
+        aria-label="Interactive demo counter. Activate to count up.">
+  <h1 class="tagline">The most satisfying way to <em>count anything</em>.</h1>
+
+  <div class="odometer" id="odometer" aria-hidden="true">
+    <span class="digit dim"><span class="strip"><b>0</b><b>1</b><b>2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b></span></span>
+    <span class="digit dim"><span class="strip"><b>0</b><b>1</b><b>2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b></span></span>
+    <span class="digit"><span class="strip"><b>0</b><b>1</b><b>2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b></span></span>
+  </div>
+  <p class="visually-hidden" aria-live="polite" id="count-announce" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"></p>
+
+  <p class="hint">Go on — <b>tap anywhere</b>. In the app, every tap clicks under your finger.</p>
+
+  <div class="platforms">
+    <span class="pill">iPhone</span>
+    <span class="pill">iPad</span>
+    <span class="pill">Apple Watch</span>
+    <span class="pill soon">Coming soon to the App Store</span>
+  </div>
+</header>
+
+<main>
+  <section class="reveal">
+    <p class="kicker">Four ways to count</p>
+    <h2>One screen. One tap. Four modes.</h2>
+    <div class="modes">
+      <div class="mode">
+        <span class="num">01</span>
+        <h3>Tap counter</h3>
+        <p>Count up, one tap at a time, with an optional goal to chase.</p>
+      </div>
+      <div class="mode">
+        <span class="num">02</span>
+        <h3>Tap countdown</h3>
+        <p>Start from any number and work your way down to zero.</p>
+      </div>
+      <div class="mode">
+        <span class="num">03</span>
+        <h3>Stopwatch</h3>
+        <p>A timed counter you start and pause with a single tap.</p>
+      </div>
+      <div class="mode">
+        <span class="num">04</span>
+        <h3>Countdown timer</h3>
+        <p>Set minutes and seconds, tap to start, get alerted at zero.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <p class="kicker">Feels amazing</p>
+    <h2>Designed around the click.</h2>
+    <ul class="feel">
+      <li><b>The whole screen is the button</b> — you never miss.</li>
+      <li><b>Crisp haptic feedback</b> on every tap, with a stronger pulse every ten.</li>
+      <li><b>Digits roll up and down</b> like a physical tally clicker.</li>
+      <li><b>Ripples follow your fingertip</b> across the screen.</li>
+      <li><b>Goal reached?</b> The whole screen changes color, and Mittari vibrates or plays a sound.</li>
+      <li><b>Swipe up to reset</b>, like flicking to the next video.</li>
+      <li><b>Everything is remembered</b> — mode, values, and your current count.</li>
+      <li><b>Beautiful in light and dark</b>, on every device.</li>
+    </ul>
+  </section>
+
+  <section class="reveal">
+    <div class="split">
+      <div class="panel">
+        <p class="kicker">On your wrist</p>
+        <h2>A real Apple Watch app.</h2>
+        <p>Raise your wrist, tap the screen, and count with crisp watch
+        haptics. It works standalone — no iPhone needed.</p>
+      </div>
+      <div class="panel privacy">
+        <p class="kicker">Private by design</p>
+        <h2>No accounts. No ads. No network.</h2>
+        <p>Mittari collects nothing and connects to nothing. Your counts
+        live on your device and nowhere else.</p>
+        <p><a href="privacy.html">Read the full privacy policy →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="support" class="reveal">
+    <p class="kicker">Support</p>
+    <h2>Questions? Ideas? Something broken?</h2>
+    <p>Mittari is made by one person who reads every email. Bug reports,
+    feature requests, or just to say the click feels great:</p>
+    <a class="mail" href="mailto:dresende@thinkdigital.pt">dresende@thinkdigital.pt</a>
+  </section>
+</main>
+
+<footer>
+  <span>© 2026 Diogo Resende</span>
+  <span class="fi">mittari — Finnish for “gauge”.</span>
+  <a href="privacy.html">Privacy Policy</a>
+</footer>
+
+<script>
+(function () {
+  var hero = document.getElementById("hero");
+  var odometer = document.getElementById("odometer");
+  var digits = odometer.querySelectorAll(".digit");
+  var announce = document.getElementById("count-announce");
+  var count = 0;
+
+  function render() {
+    var s = String(count % 1000).padStart(3, "0");
+    for (var i = 0; i < 3; i++) {
+      var d = digits[i];
+      d.querySelector(".strip").style.transform =
+        "translateY(-" + (Number(s[i]) * 10) + "%)";
+      d.classList.toggle("dim", i < s.search(/[^0]/) || s === "000");
+    }
+  }
+
+  function ripple(x, y, tenth) {
+    var r = document.createElement("span");
+    r.className = "ripple" + (tenth ? " tenth" : "");
+    r.style.left = x + "px";
+    r.style.top = y + "px";
+    hero.appendChild(r);
+    setTimeout(function () { r.remove(); }, 650);
+  }
+
+  function bump(x, y) {
+    count++;
+    var tenth = count % 10 === 0;
+    render();
+    ripple(x, y, tenth);
+    if (tenth) {
+      odometer.classList.add("milestone");
+      setTimeout(function () { odometer.classList.remove("milestone"); }, 450);
+    }
+    announce.textContent = String(count);
+    if (navigator.vibrate) navigator.vibrate(tenth ? 30 : 10);
+  }
+
+  hero.addEventListener("pointerdown", function (e) {
+    if (e.target.closest("a")) return;
+    var rect = hero.getBoundingClientRect();
+    bump(e.clientX - rect.left, e.clientY - rect.top);
+  });
+
+  hero.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      bump(hero.clientWidth / 2, hero.clientHeight / 2);
+    }
+  });
+
+  // scroll reveals
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) {
+        en.target.classList.add("in");
+        io.unobserve(en.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+})();
+</script>
+</body>
+</html>
