@@ -250,8 +250,9 @@
     margin-bottom: 34px;
   }
 
-  .reveal { opacity: 0; transform: translateY(30px); transition: opacity .7s, transform .7s cubic-bezier(.2,.9,.3,1); }
-  .reveal.in { opacity: 1; transform: none; }
+  .reveal { transition: opacity .7s, transform .7s cubic-bezier(.2,.9,.3,1); }
+  html.js .reveal { opacity: 0; transform: translateY(30px); }
+  html.js .reveal.in { opacity: 1; transform: none; }
 
   /* mode cards — staggered diagonal */
   .modes {
@@ -528,7 +529,8 @@
     }
   });
 
-  // scroll reveals
+  // scroll reveals — hidden state only applies once JS is running
+  document.documentElement.classList.add("js");
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (en) {
       if (en.isIntersecting) {
