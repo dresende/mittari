@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mittari — Tap. Count. Feel the click.</title>
 <meta name="description" content="Mittari is the most satisfying way to count anything. Counters, countdowns, timers and goals — with crisp haptics — on iPhone, iPad and Apple Watch.">
+<link rel="icon" href="icon-180.png" sizes="180x180">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mittari — Tap. Count. Feel the click.">
+<meta property="og:description" content="The most satisfying way to count anything. Counters, countdowns, timers and goals, with crisp haptics.">
+<meta property="og:image" content="https://dresende.github.io/mittari/icon-512.png">
+<meta property="og:url" content="https://dresende.github.io/mittari/">
+<meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@125,700..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -342,6 +350,29 @@
   .panel.privacy .kicker { color: var(--emerald); }
   .panel p + p { margin-top: 10px; }
 
+  /* more from us */
+  .sibling {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: linear-gradient(165deg, var(--panel), rgba(29,29,56,.4));
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius);
+    padding: 22px 26px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .3s, transform .3s cubic-bezier(.2,.9,.3,1);
+  }
+  .sibling:hover { border-color: #E84C8A; transform: translateY(-4px); }
+  .sibling .mark {
+    width: 52px; height: 52px;
+    border-radius: 13px;
+    flex: none;
+    background: var(--panel-edge);
+  }
+  .sibling h3 { font-size: 1.1rem; margin-bottom: 3px; }
+  .sibling p { color: var(--ink-dim); font-size: .92rem; }
+
   /* support */
   #support { text-align: center; }
   #support h2 { margin: 0 auto 14px; }
@@ -480,6 +511,19 @@
         <p><a href="privacy.html">Read the full privacy policy →</a></p>
       </div>
     </div>
+  </section>
+
+  <section class="reveal">
+    <p class="kicker">More from us</p>
+    <h2>Same promise, different number.</h2>
+    <a class="sibling" href="https://dresende.github.io/tulos/">
+      <img class="mark" src="https://dresende.github.io/tulos/icon-180.png"
+           alt="" width="52" height="52" loading="lazy">
+      <span>
+        <h3>Tulos</h3>
+        <p>The score keeper for game night. Pay once, score anything.</p>
+      </span>
+    </a>
   </section>
 
   <section id="support" class="reveal">
